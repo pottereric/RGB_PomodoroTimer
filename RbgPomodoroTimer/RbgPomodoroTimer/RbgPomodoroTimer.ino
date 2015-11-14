@@ -3,8 +3,7 @@ int redPin = 11;
 int bluePin = 10;
 int greenPin = 9;
  
-//uncomment this line if using a Common Anode LED
-#define COMMON_ANODE
+//this code is using a Common Anode LED
 
 int delayTime = 78;
 
@@ -21,13 +20,13 @@ void loop()
 {
   int i = 0;
   
-  for (i = 255; i >= 0; i--){ // green to blue
-    setColor(0, i, 255-i);
+  for (i = 0; i <= 255; i++){ // green to blue
+    setColor(255, i, 255-i);
     delay(delayTime); 
   }
  
-  for (i = 255; i >= 0; i--){ // blue to red
-    setColor(255-i, 0, i);
+  for (i = 0; i <= 255; i++){ // blue to red
+    setColor(255-i, 255, i);
     delay(delayTime); 
   }
   
@@ -37,11 +36,6 @@ void loop()
  
 void setColor(int red, int green, int blue)
 {
-  #ifdef COMMON_ANODE
-    red = 255 - red;
-    green = 255 - green;
-    blue = 255 - blue;
-  #endif
   analogWrite(redPin, red);
   analogWrite(greenPin, green);
   analogWrite(bluePin, blue);  
@@ -49,16 +43,15 @@ void setColor(int red, int green, int blue)
 
 void PulseRed(){
     while(true){
-        
+    int i = 0;    
     for(i = 0; i <= 255; i++){
-      setColor(i, 0, 0);
+      setColor(i, 255, 255);
       delay(10);
     }
     
     for(i = 255; i > 0; i--){
-      setColor(i, 0, 0);
+      setColor(i, 255, 255);
       delay(10);
     }
     }
-  
 }
