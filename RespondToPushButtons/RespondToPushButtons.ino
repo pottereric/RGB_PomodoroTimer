@@ -2,9 +2,10 @@
 Adafruit Arduino - Lesson 3. RGB LED
 */
  
+int annodePin = 12;
 int redPin = 11;
-int greenPin = 9;
 int bluePin = 10;
+int greenPin = 9;
  
 int blackBtnPin = 7;
 int redBtnPin = 6;
@@ -19,8 +20,8 @@ void setup()
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);  
-  pinMode(13, OUTPUT);
-  digitalWrite(13, HIGH);
+  pinMode(annodePin, OUTPUT);
+  digitalWrite(annodePin, HIGH);
   pinMode(blackBtnPin, INPUT_PULLUP);
   pinMode(redBtnPin, INPUT_PULLUP);
   pinMode(5, OUTPUT);

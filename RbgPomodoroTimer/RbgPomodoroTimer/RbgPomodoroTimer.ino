@@ -1,23 +1,22 @@
-/*
-Adafruit Arduino - Lesson 3. RGB LED
-*/
+
  
+int annodePin = 12;
 int redPin = 11;
-int greenPin = 10;
-int bluePin = 9;
+int bluePin = 10;
+int greenPin = 9;
  
 //uncomment this line if using a Common Anode LED
 #define COMMON_ANODE
 
-int delayTime = 50;
+int delayTime = 20;
 
 void setup()
 {
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);  
-  pinMode(13, OUTPUT);
-  digitalWrite(13, HIGH);
+  pinMode(annodePin, OUTPUT);
+  digitalWrite(annodePin, HIGH);
 }
  
 void loop()
