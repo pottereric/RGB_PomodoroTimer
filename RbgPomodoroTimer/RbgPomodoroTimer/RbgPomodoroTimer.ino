@@ -1,9 +1,16 @@
-int annodePin = 12;
-int redPin = 11;
-int bluePin = 10;
-int greenPin = 9;
- 
+const int annodePin = 12;
+const int redPin = 11;
+const int bluePin = 10;
+const int greenPin = 9;
+
+const int greenToBlue = 1;
+const int blueToRed = 2;
+const int pluseRed = 3;
+
 //this code is using a Common Anode LED
+int color;
+int state;
+
 
 int delayTime = 78;
 
@@ -14,23 +21,55 @@ void setup()
   pinMode(bluePin, OUTPUT);  
   pinMode(annodePin, OUTPUT);
   digitalWrite(annodePin, HIGH);
+  
+  color = 0;
+  state = greenToBlue;
 }
+ 
+// Generally, you should use "unsigned long" for variables that hold time
+// The value will quickly become too large for an int to store
+unsigned long previousMillis = 0;        // will store last time LED was updated
+
+// constants won't change :
+const long interval = 117;           // interval at which to blink (milliseconds) 
  
 void loop()
 {
-  int i = 0;
   
-  for (i = 0; i <= 255; i++){ // green to blue
-    setColor(255, i, 255-i);
-    delay(delayTime); 
-  }
- 
-  for (i = 0; i <= 255; i++){ // blue to red
-    setColor(255-i, 255, i);
-    delay(delayTime); 
-  }
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
   
- PulseRed();
+    switch(state){
+     case greenToBlue:
+       setColor(255, color, 255 - color);
+       color++;
+       if(color == 255)
+       {
+         color = 0;
+        state = blueToRed; 
+       }
+      break;
+     case blueToRed:
+     setColor(255-color, 255, color);
+       color++;
+       if(color == 255)
+       {
+         color = 0;
+        state = pluseRed; 
+       }
+      break;
+     case pluseRed:
+       PulseRed();
+      break;
+      
+    }
+  
+  }
+
+  
     
 }
  
