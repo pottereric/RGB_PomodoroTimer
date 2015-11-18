@@ -1,3 +1,7 @@
+#include <Bounce.h>
+
+//#define SERIAL_DEBUGGING
+
 const int annodePin = 12;
 const int redPin = 11;
 const int bluePin = 10;
@@ -5,6 +9,9 @@ const int greenPin = 9;
 
 int blackBtnPin = 7;
 int redBtnPin = 6;
+
+Bounce blackBtn = Bounce( blackBtnPin,5 ); 
+Bounce redBtn = Bounce( redBtnPin,5 ); 
 
 const int noColor = 0;
 const int greenToBlue = 1;
@@ -19,7 +26,6 @@ const int BreakSequence = 2;
 int color;
 int state;
 int sequence;
-
 
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
@@ -51,38 +57,62 @@ void setup()
   color = 0;
   sequence = Idle;
   state = noColor;
+  
+  #ifdef SERIAL_DEBUGGING
+  Serial.begin(9600);
+  #endif
 }
  
  
 void loop()
 {
-  if(digitalRead(blackBtnPin) == LOW)
+  blackBtn.update();
+  redBtn.update();
+  
+  //if(blackBtn.read() == LOW)
+  if(blackBtn.fallingEdge())
   {
    switch(sequence){
      case Idle:
        sequence = PomodoroSeqence;
+       currentInterval = TwentyMinuteInterval;
        state = greenToBlue;
        break;
      case PomodoroSeqence:
        sequence = BreakSequence;
-       currentInterval = TwentyMinuteInterval;
+       currentInterval = FiveMinuteInterval;
        color = 0;
        state = greenToBlue;
        break;
      case BreakSequence:
        sequence = PomodoroSeqence; 
-       currentInterval = FiveMinuteInterval;
+       currentInterval = TwentyMinuteInterval;
        color = 0;
        state = greenToBlue;
        break;
    }
+   #ifdef SERIAL_DEBUGGING
+   Serial.println("Black");
+   Serial.println(sequence);
+   Serial.println(state);
+   Serial.println(currentInterval);
+   #endif
   }
-  else if(digitalRead(redBtnPin) == LOW)
+  //else if(redBtn.read() == LOW)
+  else if(redBtn.fallingEdge())
   {
     color = 0;
     state = greenToBlue;
+    
+    #ifdef SERIAL_DEBUGGING
+    Serial.println("Red");
+    Serial.println(sequence);
+    Serial.println(state);
+    Serial.println(currentInterval);
+    #endif
   }
-  
+
+
   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= currentInterval) {
@@ -96,7 +126,7 @@ void loop()
        if(color == 255)
        {
          color = 0;
-        state = blueToRed; 
+         state = blueToRed; 
        }
       break;
      case blueToRed:
@@ -105,12 +135,11 @@ void loop()
        if(color == 255)
        {
          color = 0;
-        state = pluseRed; 
-        currentInterval = PulsingInterval;
+         state = pluseRed; 
+         currentInterval = PulsingInterval;
        }
       break;
      case pluseRed:
-       //PulseRed();
        if(color<= 255){
          setColor(color, 255, 255);
          color++;
@@ -123,11 +152,8 @@ void loop()
        {
         color = 0; 
        }
-       
       break;
-      
     }
-  
   }
 }
  
