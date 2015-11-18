@@ -3,13 +3,22 @@ const int redPin = 11;
 const int bluePin = 10;
 const int greenPin = 9;
 
+int blackBtnPin = 7;
+int redBtnPin = 6;
+
+const int noColor = 0;
 const int greenToBlue = 1;
 const int blueToRed = 2;
 const int pluseRed = 3;
 
+const int Idle = 0;
+const int PomodoroSeqence = 1;
+const int BreakSequence = 2;
+
 //this code is using a Common Anode LED
 int color;
 int state;
+int sequence;
 
 
 // Generally, you should use "unsigned long" for variables that hold time
@@ -32,14 +41,47 @@ void setup()
   pinMode(annodePin, OUTPUT);
   digitalWrite(annodePin, HIGH);
   
+  pinMode(blackBtnPin, INPUT_PULLUP);
+  pinMode(redBtnPin, INPUT_PULLUP);
+  pinMode(5, OUTPUT);
+  digitalWrite(5, LOW);
+  pinMode(4, OUTPUT);
+  digitalWrite(4, LOW);
+  
   color = 0;
-  state = greenToBlue;
-  currentInterval = OneMinuteInterval;
+  sequence = Idle;
+  state = noColor;
 }
  
  
 void loop()
 {
+  if(digitalRead(blackBtnPin) == LOW)
+  {
+   switch(sequence){
+     case Idle:
+       sequence = PomodoroSeqence;
+       state = greenToBlue;
+       break;
+     case PomodoroSeqence:
+       sequence = BreakSequence;
+       currentInterval = TwentyMinuteInterval;
+       color = 0;
+       state = greenToBlue;
+       break;
+     case BreakSequence:
+       sequence = PomodoroSeqence; 
+       currentInterval = FiveMinuteInterval;
+       color = 0;
+       state = greenToBlue;
+       break;
+   }
+  }
+  else if(digitalRead(redBtnPin) == LOW)
+  {
+    color = 0;
+    state = greenToBlue;
+  }
   
   unsigned long currentMillis = millis();
 
@@ -96,17 +138,3 @@ void setColor(int red, int green, int blue)
   analogWrite(bluePin, blue);  
 }
 
-void PulseRed(){
-    while(true){
-    int i = 0;    
-    for(i = 0; i <= 255; i++){
-      setColor(i, 255, 255);
-      delay(10);
-    }
-    
-    for(i = 255; i > 0; i--){
-      setColor(i, 255, 255);
-      delay(10);
-    }
-    }
-}
