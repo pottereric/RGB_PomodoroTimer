@@ -12,7 +12,17 @@ int color;
 int state;
 
 
-int delayTime = 78;
+// Generally, you should use "unsigned long" for variables that hold time
+// The value will quickly become too large for an int to store
+unsigned long previousMillis = 0;        // will store last time LED was updated
+
+// constants won't change :
+const long PulsingInterval = 10;
+const long OneMinuteInterval = 117;
+const long FiveMinuteInterval = 588;
+const long TwentyMinuteInterval = 2941;
+
+long currentInterval;
 
 void setup()
 {
@@ -24,21 +34,16 @@ void setup()
   
   color = 0;
   state = greenToBlue;
+  currentInterval = OneMinuteInterval;
 }
  
-// Generally, you should use "unsigned long" for variables that hold time
-// The value will quickly become too large for an int to store
-unsigned long previousMillis = 0;        // will store last time LED was updated
-
-// constants won't change :
-const long interval = 117;           // interval at which to blink (milliseconds) 
  
 void loop()
 {
   
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis - previousMillis >= currentInterval) {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
   
@@ -59,18 +64,29 @@ void loop()
        {
          color = 0;
         state = pluseRed; 
+        currentInterval = PulsingInterval;
        }
       break;
      case pluseRed:
-       PulseRed();
+       //PulseRed();
+       if(color<= 255){
+         setColor(color, 255, 255);
+         color++;
+       }
+       else if (color <= 510){
+         setColor(255 - (color - 255), 255, 255);
+         color++;
+       }
+       else
+       {
+        color = 0; 
+       }
+       
       break;
       
     }
   
   }
-
-  
-    
 }
  
 void setColor(int red, int green, int blue)
