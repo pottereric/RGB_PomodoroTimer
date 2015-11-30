@@ -1,6 +1,6 @@
 #include <Bounce.h>
 
-//#define SERIAL_DEBUGGING
+#define SERIAL_DEBUGGING
 
 const int annodePin = 12;
 const int redPin = 11;
@@ -17,6 +17,7 @@ const int noColor = 0;
 const int greenToBlue = 1;
 const int blueToRed = 2;
 const int pluseRed = 3;
+const int yellowToRed = 4;
 
 const int Idle = 0;
 const int PomodoroSeqence = 1;
@@ -34,7 +35,8 @@ unsigned long previousMillis = 0;        // will store last time LED was updated
 // constants won't change :
 const long PulsingInterval = 10;
 const long OneMinuteInterval = 117;
-const long FiveMinuteInterval = 588;
+//const long FiveMinuteInterval = 588;
+const long FiveMinuteInterval = 1935;
 const long TwentyMinuteInterval = 2941;
 
 long currentInterval;
@@ -63,6 +65,21 @@ void setup()
   #endif
 }
  
+void StartPomodoroSequence(){
+   sequence = PomodoroSeqence;
+   currentInterval = TwentyMinuteInterval;
+   state = greenToBlue;
+   color = 0;
+   setColor(255, 0, 255);
+} 
+
+void StartBreakSequence(){
+   sequence = BreakSequence;
+   currentInterval = FiveMinuteInterval;
+   color = 100;
+   state = yellowToRed;
+   setColor(210, 100, 255);
+}
  
 void loop()
 {
@@ -74,21 +91,13 @@ void loop()
   {
    switch(sequence){
      case Idle:
-       sequence = PomodoroSeqence;
-       currentInterval = TwentyMinuteInterval;
-       state = greenToBlue;
+       StartPomodoroSequence();
        break;
      case PomodoroSeqence:
-       sequence = BreakSequence;
-       currentInterval = FiveMinuteInterval;
-       color = 0;
-       state = greenToBlue;
+       StartBreakSequence();
        break;
      case BreakSequence:
-       sequence = PomodoroSeqence; 
-       currentInterval = TwentyMinuteInterval;
-       color = 0;
-       state = greenToBlue;
+       StartPomodoroSequence();
        break;
    }
    #ifdef SERIAL_DEBUGGING
@@ -98,11 +107,17 @@ void loop()
    Serial.println(currentInterval);
    #endif
   }
-  //else if(redBtn.read() == LOW)
+  
   else if(redBtn.fallingEdge())
   {
-    color = 0;
-    state = greenToBlue;
+   switch(sequence){
+     case PomodoroSeqence:
+       StartPomodoroSequence();
+       break;
+     case BreakSequence:
+       StartBreakSequence();
+       break;
+   }
     
     #ifdef SERIAL_DEBUGGING
     Serial.println("Red");
@@ -130,7 +145,7 @@ void loop()
        }
       break;
      case blueToRed:
-     setColor(255-color, 255, color);
+       setColor(255-color, 255, color);
        color++;
        if(color == 255)
        {
@@ -153,6 +168,16 @@ void loop()
         color = 0; 
        }
       break;
+     case yellowToRed:
+       setColor(255-(color/3), color, 255);
+       color++;
+       if(color == 255)
+       {
+         color = 0;
+         state = pluseRed; 
+         currentInterval = PulsingInterval;
+       }
+       break;
     }
   }
 }
