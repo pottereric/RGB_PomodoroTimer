@@ -7,8 +7,10 @@ const int redPin = 11;
 const int bluePin = 10;
 const int greenPin = 9;
 
-int blackBtnPin = 7;
-int redBtnPin = 6;
+const int blackBtnPin = 7;
+const int redBtnPin = 6;
+const int blackBtnPinSource = 5;
+const int redBtnPinSource = 4;
 
 Bounce blackBtn = Bounce( blackBtnPin,5 ); 
 Bounce redBtn = Bounce( redBtnPin,5 ); 
@@ -23,7 +25,6 @@ const int Idle = 0;
 const int PomodoroSeqence = 1;
 const int BreakSequence = 2;
 
-//this code is using a Common Anode LED
 int color;
 int state;
 int sequence;
@@ -32,10 +33,8 @@ int sequence;
 // The value will quickly become too large for an int to store
 unsigned long previousMillis = 0;        // will store last time LED was updated
 
-// constants won't change :
 const long PulsingInterval = 10;
 const long OneMinuteInterval = 117;
-//const long FiveMinuteInterval = 588;
 const long FiveMinuteInterval = 1935;
 const long TwentyMinuteInterval = 2941;
 
@@ -51,10 +50,10 @@ void setup()
   
   pinMode(blackBtnPin, INPUT_PULLUP);
   pinMode(redBtnPin, INPUT_PULLUP);
-  pinMode(5, OUTPUT);
-  digitalWrite(5, LOW);
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
+  pinMode(blackBtnPinSource, OUTPUT);
+  digitalWrite(blackBtnPinSource, LOW);
+  pinMode(redBtnPinSource, OUTPUT);
+  digitalWrite(redBtnPinSource, LOW);
   
   color = 0;
   sequence = Idle;
@@ -81,12 +80,17 @@ void StartBreakSequence(){
    setColor(210, 100, 255);
 }
  
+void StartPulsingSequence(){
+  color = 0;
+  state = pluseRed; 
+  currentInterval = PulsingInterval;
+} 
+ 
 void loop()
 {
   blackBtn.update();
   redBtn.update();
   
-  //if(blackBtn.read() == LOW)
   if(blackBtn.fallingEdge())
   {
    switch(sequence){
@@ -149,9 +153,7 @@ void loop()
        color++;
        if(color == 255)
        {
-         color = 0;
-         state = pluseRed; 
-         currentInterval = PulsingInterval;
+         StartPulsingSequence();
        }
       break;
      case pluseRed:
@@ -173,9 +175,7 @@ void loop()
        color++;
        if(color == 255)
        {
-         color = 0;
-         state = pluseRed; 
-         currentInterval = PulsingInterval;
+         StartPulsingSequence();
        }
        break;
     }
